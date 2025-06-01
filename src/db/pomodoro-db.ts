@@ -1,19 +1,20 @@
-import Dexie, {type EntityTable} from 'dexie';
+import Dexie, { type EntityTable } from 'dexie';
 
-export interface Task {
-    id: string;
-    title: string;
-    totalPomodoros: number;
-    completedPomodoros: number;
-    status: 'pending' | 'done';
+interface Task {
+  id: string;
+  taskName: string;
+  totalPomodoros: number;
+  completedPomodoros: number;
+  status: 'pending' | 'done';
 }
 
 const PomodoroDB = new Dexie('PomodoroDatabase') as Dexie & {
-    tasks: EntityTable<Task, 'id'>;
-}
+  tasks: EntityTable<Task, 'id'>;
+};
 
 PomodoroDB.version(1).stores({
-    tasks: '++id, title, totalPomodoros, completedPomodoros, status'
+  tasks: 'id, taskName, totalPomodoros, completedPomodoros, status',
 });
 
-export {PomodoroDB}
+export type { Task };
+export { PomodoroDB };
