@@ -5,7 +5,7 @@ interface Task {
   taskName: string;
   totalPomodoros: number;
   completedPomodoros: number;
-  status: 'pending' | 'done';
+  status: 'pending' | 'doning' | 'done';
 }
 
 const PomodoroDB = new Dexie('PomodoroDatabase') as Dexie & {

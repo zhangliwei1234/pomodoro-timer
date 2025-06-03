@@ -11,23 +11,21 @@ import { type Task } from '../../db/pomodoro-db.ts';
 
 interface Props {
   tasksData: Task[];
+  onDelete: (id: string) => void;
 }
 
-export default function PomodoroTaskCards({ tasksData }: Props) {
+const PomodoroTaskCards = ({ tasksData, onDelete }: Props) => {
   const [tasks, setTasks] = useState<Task[]>(tasksData);
   useEffect(() => {
     setTasks(tasksData);
   }, [tasksData]);
 
-  const handleDelete = (id: string) => {
-    setTasks(prev => prev.filter(task => task.id !== id));
-  };
 
-  const firstPendingIndex = tasks.findIndex(t => t.status !== 'done');
+
+  const firstPendingIndex = tasks.findIndex(t => t.status === 'doing');
 
   return (
     <div className='mx-auto mt-6 max-w-md space-y-5'>
-      {}
       {tasks.length === 0 ? (
         <div className='py-10 text-center text-sm text-zinc-400 dark:text-zinc-500'>
           <Icon
@@ -53,8 +51,8 @@ export default function PomodoroTaskCards({ tasksData }: Props) {
               >
                 {/* 删除按钮 */}
                 <button
-                  onClick={() => handleDelete(id)}
-                  className={`absolute right-2 top-2 text-zinc-400 ${index === 0 ? 'invisible' : 'visible'}`}
+                  onClick={() => onDelete(id)}
+                  className={`absolute right-2 top-2 text-zinc-400 ${isDone ? 'invisible' : 'visible'}`}
                   title='删除任务'
                 >
                   <Icon icon='lucide:trash-2' width='16' />
@@ -83,11 +81,10 @@ export default function PomodoroTaskCards({ tasksData }: Props) {
                           key={i}
                           icon='fluent-emoji:tomato'
                           width='18'
-                          className={`transition-opacity duration-200 ${
-                            i < completedPomodoros
-                              ? 'opacity-100'
-                              : 'opacity-30'
-                          }`}
+                          className={`transition-opacity duration-200 ${i < completedPomodoros
+                            ? 'opacity-100'
+                            : 'opacity-30'
+                            }`}
                         />
                       ))}
                     </div>
@@ -101,3 +98,5 @@ export default function PomodoroTaskCards({ tasksData }: Props) {
     </div>
   );
 }
+
+export default PomodoroTaskCards;

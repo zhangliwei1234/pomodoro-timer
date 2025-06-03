@@ -1,8 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card.tsx";
 import { Button } from "../ui/button.tsx";
-import { Pause, RotateCcw } from "lucide-react";
+import { Pause, RotateCcw, Play } from "lucide-react";
 
-const CenterCard = () => {
+interface Props {
+    taskName: string;
+    onStart: () => void;
+}
+
+const CenterCard = ({ taskName,onStart }: Props) => {
     return (
         <Card className="backdrop-blur-lg bg-white/50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-700 rounded-2xl shadow-xl max-w-2xl mx-auto">
             <CardHeader className="text-center">
@@ -13,12 +18,13 @@ const CenterCard = () => {
 
             <CardContent className="flex flex-col items-center space-y-4">
                 <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                    当前任务：<span className="font-medium">任务名称</span>
+                    当前任务：<span className="font-medium">{taskName}</span>
                 </p>
 
                 <div className="flex gap-4">
-                    <Button className="px-6 py-2 rounded-xl text-lg shadow-md hover:shadow-lg transition">
-                        <Pause className="w-4 h-4 mr-2" />
+                    <Button className="px-6 py-2 rounded-xl text-lg shadow-md hover:shadow-lg transition" onClick={() => onStart()}>
+                        <Play className="w-4 h-4 mr-2" />
+                        {/* <Pause className="w-4 h-4 mr-2" /> */}
                         开始
                     </Button>
                     <Button

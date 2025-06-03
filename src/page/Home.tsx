@@ -24,20 +24,41 @@ const handleAddTask = async (task: {
   });
 };
 
+// 删除任务
+const handleDeleteTask = async (id: string) => {
+  await PomodoroDB.tasks.delete(id);
+};
+
+// 开始任务
+const  handleStartTask = async (id: string) => {
+  console.log('开始任务', id);
+  await PomodoroDB.tasks.update(id, {
+    status: 'doing',
+  });
+};
+
 const Home = () => {
   const [tasksData, setTasksData] = useState<Task[]>([]);
   const tasks = useLiveQuery(() => PomodoroDB.tasks.toArray()) || [];
+  const [firstPendingIndex, setFirstPendingIndex] = useState(0);
+
 
   useEffect(() => {
     setTasksData(tasks.reverse());
   }, [tasks]);
+
+  useEffect(() => {
+    setFirstPendingIndex(tasksData.findIndex(t => t.status !== 'done'))
+  }, [tasksData]);
+
+
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-zinc-100 to-zinc-50 px-4 py-8 text-zinc-900 dark:from-zinc-900 dark:to-zinc-800 dark:text-white'>
       <Header />
 
       {/* 中心计时卡片 */}
-      <CenterCard />
+      <CenterCard taskName={tasksData[firstPendingIndex]?.taskName || ''} onStart={() => handleStartTask(tasksData[firstPendingIndex]?.id || '')}/>
 
       {/* 添加任务按钮 */}
       <div className='mx-auto mt-8 max-w-xl'>
@@ -50,7 +71,7 @@ const Home = () => {
         <CumulativeCard />
       </div>
 
-      <AppleStackedTasks tasksData={tasksData}></AppleStackedTasks>
+      <AppleStackedTasks tasksData={tasksData} onDelete={handleDeleteTask}></AppleStackedTasks>
     </div>
   );
 };
