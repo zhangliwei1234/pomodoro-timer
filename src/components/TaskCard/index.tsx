@@ -20,9 +20,7 @@ const PomodoroTaskCards = ({ tasksData, onDelete }: Props) => {
     setTasks(tasksData);
   }, [tasksData]);
 
-
-
-  const firstPendingIndex = tasks.findIndex(t => t.status === 'doing');
+  const firstPendingIndex = tasks.findIndex(t => t.status === 'active');
 
   return (
     <div className='mx-auto mt-6 max-w-md space-y-5'>
@@ -41,8 +39,8 @@ const PomodoroTaskCards = ({ tasksData, onDelete }: Props) => {
             { id, taskName, totalPomodoros, completedPomodoros, status },
             index,
           ) => {
-            const isDone = status === 'done';
-            const isActive = index === firstPendingIndex && !isDone;
+            const isDone = status === 'completed' || status === 'cancelled';
+            const isActive = index === firstPendingIndex;
 
             return (
               <Card
@@ -52,7 +50,7 @@ const PomodoroTaskCards = ({ tasksData, onDelete }: Props) => {
                 {/* 删除按钮 */}
                 <button
                   onClick={() => onDelete(id)}
-                  className={`absolute right-2 top-2 text-zinc-400 ${isDone ? 'invisible' : 'visible'}`}
+                  className={`absolute right-2 top-2 text-zinc-400 ${isActive ? 'invisible' : 'visible'}`}
                   title='删除任务'
                 >
                   <Icon icon='lucide:trash-2' width='16' />
@@ -81,10 +79,11 @@ const PomodoroTaskCards = ({ tasksData, onDelete }: Props) => {
                           key={i}
                           icon='fluent-emoji:tomato'
                           width='18'
-                          className={`transition-opacity duration-200 ${i < completedPomodoros
-                            ? 'opacity-100'
-                            : 'opacity-30'
-                            }`}
+                          className={`transition-opacity duration-200 ${
+                            i < completedPomodoros
+                              ? 'opacity-100'
+                              : 'opacity-30'
+                          }`}
                         />
                       ))}
                     </div>
@@ -97,6 +96,6 @@ const PomodoroTaskCards = ({ tasksData, onDelete }: Props) => {
       )}
     </div>
   );
-}
+};
 
 export default PomodoroTaskCards;

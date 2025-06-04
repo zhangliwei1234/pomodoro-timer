@@ -19,7 +19,8 @@ const handleAddTask = async (task: {
     taskName: task.taskName,
     totalPomodoros: task.pomodoroCount,
     completedPomodoros: 0,
-    status: 'pending',
+    remainingTime: 25,
+    status: 'planned',
     id: nanoid(),
   });
 };
@@ -30,10 +31,10 @@ const handleDeleteTask = async (id: string) => {
 };
 
 // 开始任务
-const  handleStartTask = async (id: string) => {
+const handleStartTask = async (id: string) => {
   console.log('开始任务', id);
   await PomodoroDB.tasks.update(id, {
-    status: 'doing',
+    status: 'active',
   });
 };
 
@@ -42,36 +43,37 @@ const Home = () => {
   const tasks = useLiveQuery(() => PomodoroDB.tasks.toArray()) || [];
   const [firstPendingIndex, setFirstPendingIndex] = useState(0);
 
-
   useEffect(() => {
     setTasksData(tasks.reverse());
   }, [tasks]);
 
   useEffect(() => {
-    setFirstPendingIndex(tasksData.findIndex(t => t.status !== 'done'))
+    setFirstPendingIndex(
+      tasksData.findIndex(t => t.status === 'planned' || t.status === 'active'),
+    );
   }, [tasksData]);
-
-
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-zinc-100 to-zinc-50 px-4 py-8 text-zinc-900 dark:from-zinc-900 dark:to-zinc-800 dark:text-white'>
       <Header />
-
       {/* 中心计时卡片 */}
-      <CenterCard taskName={tasksData[firstPendingIndex]?.taskName || ''} onStart={() => handleStartTask(tasksData[firstPendingIndex]?.id || '')}/>
-
+      <CenterCard
+        task={tasksData[firstPendingIndex] || {}}
+        onStart={() => handleStartTask(tasksData[firstPendingIndex]?.id || '')}
+      />
       {/* 添加任务按钮 */}
       <div className='mx-auto mt-8 max-w-xl'>
         <AddTask onAddTask={handleAddTask} />
       </div>
-
       {/* 今日统计卡片 */}
       <div className='mx-auto mt-8 grid max-w-2xl grid-cols-2 gap-4'>
         <CompletedCard />
         <CumulativeCard />
       </div>
-
-      <AppleStackedTasks tasksData={tasksData} onDelete={handleDeleteTask}></AppleStackedTasks>
+      <AppleStackedTasks
+        tasksData={tasksData}
+        onDelete={handleDeleteTask}
+      ></AppleStackedTasks>
     </div>
   );
 };
