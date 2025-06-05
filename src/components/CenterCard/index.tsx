@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
 import { Pause, RotateCcw, Play, X } from 'lucide-react';
 import { type Task } from '../../db/pomodoro-db';
-import { usePomodoroTimer } from '../../hooks/usePomodoroTimer';
+import { usePomodoroTimer } from '../../hooks/usePomodoroTimer.ts';
 
 interface Props {
   task: Task;
@@ -14,118 +13,95 @@ interface Props {
   onReset: () => void;
 }
 
-const CenterCard = ({
+export default function CenterCard({
   task,
   onStart,
   onPause,
   onResume,
   onCancel,
   onReset,
-}: Props) => {
+}: Props) {
   const { secondsRemaining, isActive, start, pause, resume, reset } =
-    usePomodoroTimer(task.totalPomodoros * 25 * 60, () => {
-      pause();
-      // 可扩展：震动、提示音等
+    usePomodoroTimer(task.remainingTime * 60, () => {
+      console.log('一个番茄钟完成 ✅');
     });
 
-  useEffect(() => {
-    if (task.status === 'active' && !isActive) {
-      start();
-      onStart();
-    } else if (task.status === 'paused') {
-      pause();
-      onPause();
-    } else if (task.status !== 'active') {
-      reset(task.remainingTime * 60);
-    }
-  }, [task.status, task.remainingTime]);
+  const formatTime = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds
+      .toString()
+      .padStart(2, '0')}`;
+  };
 
   const handleReset = () => {
-    reset(task.totalPomodoros * 25 * 60);
     onReset();
   };
 
+  const handleStart = () => {
+    start();
+    onStart();
+  };
+
+  const handlePause = () => {
+    pause();
+    // onPause();
+  };
+
+  const handleResume = () => {
+    onResume();
+  };
+
   const handleCancel = () => {
-    reset(0);
     onCancel();
   };
 
-  const formatTime = (s: number) =>
-    `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-
   const getActionButton = () => {
-    if (secondsRemaining <= 0) {
-      return (
-        <Button onClick={handleReset} className='btn-primary'>
-          <RotateCcw className='mr-2 h-4 w-4' />
-          重新开始
-        </Button>
-      );
+    switch (task.status) {
+      case 'active':
+        return (
+          <Button onClick={handlePause} className='action-btn'>
+            <Pause className='mr-2 h-4 w-4' />
+            暂停
+          </Button>
+        );
+      case 'paused':
+        return (
+          <Button onClick={handleResume} className='action-btn'>
+            <Play className='mr-2 h-4 w-4' />
+            继续
+          </Button>
+        );
+      default:
+        return (
+          <Button onClick={handleStart} className='action-btn'>
+            <Play className='mr-2 h-4 w-4' />
+            开始
+          </Button>
+        );
     }
-
-    if (task.status === 'active') {
-      return (
-        <Button onClick={pause} className='btn-primary'>
-          <Pause className='mr-2 h-4 w-4' />
-          暂停
-        </Button>
-      );
-    }
-
-    if (task.status === 'paused') {
-      return (
-        <Button
-          onClick={() => {
-            resume();
-            onResume();
-          }}
-          className='btn-primary'
-        >
-          <Play className='mr-2 h-4 w-4' />
-          继续
-        </Button>
-      );
-    }
-
-    return (
-      <Button
-        onClick={() => {
-          start();
-          onStart();
-        }}
-        className='btn-primary'
-        disabled={secondsRemaining <= 0}
-      >
-        <Play className='mr-2 h-4 w-4' />
-        开始
-      </Button>
-    );
   };
 
   return (
-    <Card className='pomodoro-card'>
+    <Card className='mx-auto max-w-2xl rounded-2xl border border-zinc-200 bg-white/60 shadow-xl backdrop-blur-md dark:border-zinc-700 dark:bg-zinc-900/30'>
       <CardHeader className='text-center'>
-        <CardTitle className='bg-gradient-to-r from-zinc-800 to-zinc-500 bg-clip-text font-mono text-7xl text-transparent dark:from-white dark:to-zinc-300'>
+        <CardTitle className='bg-gradient-to-r from-zinc-800 to-zinc-500 bg-clip-text font-mono text-7xl tracking-widest text-transparent text-zinc-800 dark:from-white dark:to-zinc-300 dark:text-white'>
           {formatTime(secondsRemaining)}
         </CardTitle>
       </CardHeader>
-
-      <CardContent className='flex flex-col items-center space-y-4'>
-        <div className='text-sm text-zinc-600 dark:text-zinc-300'>
-          当前任务：<span className='font-medium'>{task.taskName}</span>
-        </div>
-
+      <CardContent className='flex flex-col items-center space-y-6'>
+        <p className='text-base text-zinc-700 dark:text-zinc-300'>
+          当前任务：<span className='font-semibold'>{task.taskName}</span>
+        </p>
         <div className='flex gap-4'>
           {getActionButton()}
           <Button
             variant='outline'
+            className='action-btn'
             onClick={handleCancel}
             disabled={
-              task.status === 'completed' ||
-              task.status === 'cancelled' ||
-              secondsRemaining <= 0
+              task.status === 'completed' || task.status === 'cancelled'
             }
-            className='btn-secondary'
           >
             <X className='mr-2 h-4 w-4' />
             取消
@@ -134,6 +110,4 @@ const CenterCard = ({
       </CardContent>
     </Card>
   );
-};
-
-export default CenterCard;
+}
