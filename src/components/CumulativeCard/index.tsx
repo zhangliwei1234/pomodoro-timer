@@ -1,7 +1,7 @@
 import { Card, CardContent } from '../ui/card.tsx';
 
 interface Props {
-  focusTime: string;
+  focusTime: number;
 }
 
 const CumulativeCard = ({ focusTime }: Props) => {

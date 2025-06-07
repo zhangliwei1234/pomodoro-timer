@@ -16,12 +16,25 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    buildTypes {
+    signingConfigs {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            storeFile file("../my-release-key.keystore")
+            storePassword "123456"
+            keyAlias "my-key-alias"
+            keyPassword "123456"
         }
     }
+    buildTypes {
+            release {
+                signingConfig signingConfigs.release
+                minifyEnabled true
+                shrinkResources true
+                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            }
+            debug {
+                signingConfig signingConfigs.release // 可以保持用相同签名，调试时也能安装覆盖
+            }
+        }
 }
 
 repositories {

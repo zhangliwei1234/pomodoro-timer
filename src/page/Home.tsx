@@ -148,7 +148,7 @@ const Home = () => {
       {/* 今日统计卡片 */}
       <div className='mx-auto mt-8 grid max-w-2xl grid-cols-2 gap-4'>
         <CompletedCard completedPomodoros={completedPomodoros} />
-        <CumulativeCard focusTime={focusTime.toFixed(1)} />
+        <CumulativeCard focusTime={focusTime} />
       </div>
       <AppleStackedTasks
         tasksData={tasksData}
