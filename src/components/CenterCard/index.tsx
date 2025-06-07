@@ -3,14 +3,22 @@ import { Button } from '../ui/button.tsx';
 import { Pause, RotateCcw, Play, X } from 'lucide-react';
 import { type Task } from '../../db/pomodoro-db';
 import { usePomodoroTimer } from '../../hooks/usePomodoroTimer.ts';
+import { useEffect } from 'react';
 
 interface Props {
   task: Task;
-  onStart: () => void;
-  onPause: () => void;
-  onResume: () => void;
+  onStart: (id: string) => void;
+  onPause: ({
+    id,
+    remainingTime,
+  }: {
+    id: string;
+    remainingTime: number;
+  }) => void;
+  onResume: (id: string) => void;
   onCancel: () => void;
   onReset: () => void;
+  onFinish: (id: string) => void;
 }
 
 export default function CenterCard({
@@ -20,10 +28,17 @@ export default function CenterCard({
   onResume,
   onCancel,
   onReset,
+  onFinish,
 }: Props) {
+  useEffect(() => {
+    if (task.status === 'active') {
+      start();
+    }
+  }, [task.status]);
   const { secondsRemaining, isActive, start, pause, resume, reset } =
     usePomodoroTimer(task.remainingTime * 60, () => {
-      console.log('一个番茄钟完成 ✅');
+      onFinish(task.id);
+      reset();
     });
 
   const formatTime = (totalSeconds: number) => {
@@ -38,43 +53,59 @@ export default function CenterCard({
     onReset();
   };
 
-  const handleStart = () => {
+  const handleStart = (id: string) => {
     start();
-    onStart();
+    onStart(id);
   };
 
-  const handlePause = () => {
+  const handlePause = ({
+    id,
+    remainingTime,
+  }: {
+    id: string;
+    remainingTime: number;
+  }) => {
     pause();
-    // onPause();
+    onPause({ id, remainingTime });
   };
 
-  const handleResume = () => {
-    onResume();
+  const handleResume = (id: string) => {
+    resume();
+    onResume(id);
   };
 
   const handleCancel = () => {
     onCancel();
   };
 
-  const getActionButton = () => {
+  const getActionButton = ({
+    id,
+    remainingTime,
+  }: {
+    id: string;
+    remainingTime: number;
+  }) => {
     switch (task.status) {
       case 'active':
         return (
-          <Button onClick={handlePause} className='action-btn'>
+          <Button
+            onClick={() => handlePause({ id, remainingTime })}
+            className='action-btn'
+          >
             <Pause className='mr-2 h-4 w-4' />
             暂停
           </Button>
         );
       case 'paused':
         return (
-          <Button onClick={handleResume} className='action-btn'>
+          <Button onClick={() => handleResume(id)} className='action-btn'>
             <Play className='mr-2 h-4 w-4' />
             继续
           </Button>
         );
       default:
         return (
-          <Button onClick={handleStart} className='action-btn'>
+          <Button onClick={() => handleStart(id)} className='action-btn'>
             <Play className='mr-2 h-4 w-4' />
             开始
           </Button>
@@ -94,7 +125,10 @@ export default function CenterCard({
           当前任务：<span className='font-semibold'>{task.taskName}</span>
         </p>
         <div className='flex gap-4'>
-          {getActionButton()}
+          {getActionButton({
+            id: task.id,
+            remainingTime: secondsRemaining / 60,
+          })}
           <Button
             variant='outline'
             className='action-btn'
