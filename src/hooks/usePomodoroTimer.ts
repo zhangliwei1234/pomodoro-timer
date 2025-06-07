@@ -71,7 +71,6 @@ export const usePomodoroTimer = (
 
   return {
     secondsRemaining,
-    isActive,
     start,
     pause,
     resume,

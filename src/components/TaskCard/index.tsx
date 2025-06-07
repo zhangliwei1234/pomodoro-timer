@@ -41,16 +41,21 @@ const PomodoroTaskCards = ({ tasksData, onDelete }: Props) => {
           ) => {
             const isDone = status === 'completed' || status === 'cancelled';
             const isActive = index === firstPendingIndex;
+            // 是否可以删除
+            const canDelete =
+              index === firstPendingIndex ||
+              status === 'completed' ||
+              status === 'cancelled' ||
+              completedPomodoros;
 
             return (
               <Card
                 key={id}
                 className={`group relative rounded-2xl border border-zinc-200 bg-white/80 p-4 shadow-md backdrop-blur-md transition-all duration-300 dark:border-zinc-800 dark:bg-zinc-900/70 ${isDone ? 'opacity-50' : ''} ${isActive ? 'ring-2 ring-red-500/60' : ''} `}
               >
-                {/* 删除按钮 */}
                 <button
                   onClick={() => onDelete(id)}
-                  className={`absolute right-2 top-2 text-zinc-400 ${isActive ? 'invisible' : 'visible'}`}
+                  className={`absolute right-2 top-2 text-zinc-400 ${canDelete ? 'invisible' : 'visible'}`}
                   title='删除任务'
                 >
                   <Icon icon='lucide:trash-2' width='16' />
@@ -70,7 +75,7 @@ const PomodoroTaskCards = ({ tasksData, onDelete }: Props) => {
                       variant='outline'
                       className='border-zinc-300 text-xs text-zinc-500 dark:border-zinc-700'
                     >
-                      已完成
+                      {status === 'completed' ? '已完成' : '已取消'}
                     </Badge>
                   ) : (
                     <div className='flex space-x-1.5'>

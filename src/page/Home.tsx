@@ -10,13 +10,28 @@ import { nanoid } from 'nanoid';
 import { useEffect, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 
+const statusOrder = {
+  planned: 0,
+  active: 0,
+  paused: 0,
+  completed: 1,
+  cancelled: 1,
+};
+
 const Home = () => {
   const [tasksData, setTasksData] = useState<Task[]>([]);
   const tasks = useLiveQuery(() => PomodoroDB.tasks.toArray()) || [];
   const [firstPendingIndex, setFirstPendingIndex] = useState(0);
 
   useEffect(() => {
-    setTasksData(tasks.reverse());
+    setTasksData(
+      tasks
+        .slice() // 拷贝数组
+        .sort((a, b) => {
+          // 按状态权重排序，未完成排前面
+          return statusOrder[a.status] - statusOrder[b.status];
+        }),
+    );
   }, [tasks]);
 
   useEffect(() => {
@@ -36,7 +51,7 @@ const Home = () => {
       taskName: task.taskName,
       totalPomodoros: task.pomodoroCount,
       completedPomodoros: 0,
-      remainingTime: 0.1,
+      remainingTime: 25,
       status: 'planned',
       id: nanoid(),
     });
@@ -82,14 +97,33 @@ const Home = () => {
       await PomodoroDB.tasks.update(id, {
         status: 'planned',
         completedPomodoros: tasksData[firstPendingIndex].completedPomodoros + 1,
-        remainingTime: 0.1,
+        remainingTime: 25,
       });
     }
   };
 
+  // 取消任务
+  const handleCancelTask = async (id: string) => {
+    await PomodoroDB.tasks.update(id, {
+      status: 'cancelled',
+    });
+  };
+
+  // 计算完成的番茄数
+  const completedPomodoros = tasksData.reduce(
+    (acc, cur) => acc + cur.completedPomodoros,
+    0,
+  );
+
+  // 计算专注的时间
+  const focusTime = tasksData.reduce(
+    (acc, cur) => acc + cur.completedPomodoros * cur.remainingTime,
+    0,
+  );
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-zinc-100 to-zinc-50 px-4 py-8 text-zinc-900 dark:from-zinc-900 dark:to-zinc-800 dark:text-white'>
-      <Header />
+      <Header status={tasksData[firstPendingIndex]?.status} />
       {/* 中心计时卡片 */}
       <CenterCard
         task={tasksData[firstPendingIndex] || {}}
@@ -105,6 +139,7 @@ const Home = () => {
         }}
         onResume={(id: string) => handleStartTask(id)}
         onFinish={(id: string) => handleFinishTask(id)}
+        onCancel={(id: string) => handleCancelTask(id)}
       />
       {/* 添加任务按钮 */}
       <div className='mx-auto mt-8 max-w-xl'>
@@ -112,8 +147,8 @@ const Home = () => {
       </div>
       {/* 今日统计卡片 */}
       <div className='mx-auto mt-8 grid max-w-2xl grid-cols-2 gap-4'>
-        <CompletedCard />
-        <CumulativeCard />
+        <CompletedCard completedPomodoros={completedPomodoros} />
+        <CumulativeCard focusTime={focusTime.toFixed(1)} />
       </div>
       <AppleStackedTasks
         tasksData={tasksData}

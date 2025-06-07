@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
-import { Pause, RotateCcw, Play, X } from 'lucide-react';
+import { Pause, Play, X } from 'lucide-react';
 import { type Task } from '../../db/pomodoro-db';
 import { usePomodoroTimer } from '../../hooks/usePomodoroTimer.ts';
 import { useEffect } from 'react';
+import playAppleStyleRewardSound from '../../utils/playSound.ts';
 
 interface Props {
   task: Task;
@@ -16,8 +17,7 @@ interface Props {
     remainingTime: number;
   }) => void;
   onResume: (id: string) => void;
-  onCancel: () => void;
-  onReset: () => void;
+  onCancel: (id: string) => void;
   onFinish: (id: string) => void;
 }
 
@@ -27,7 +27,6 @@ export default function CenterCard({
   onPause,
   onResume,
   onCancel,
-  onReset,
   onFinish,
 }: Props) {
   useEffect(() => {
@@ -35,11 +34,14 @@ export default function CenterCard({
       start();
     }
   }, [task.status]);
-  const { secondsRemaining, isActive, start, pause, resume, reset } =
-    usePomodoroTimer(task.remainingTime * 60, () => {
+  const { secondsRemaining, start, pause, resume, reset } = usePomodoroTimer(
+    JSON.stringify(task) === '{}' ? 0 : task.remainingTime * 60,
+    () => {
       onFinish(task.id);
       reset();
-    });
+      playAppleStyleRewardSound();
+    },
+  );
 
   const formatTime = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -47,10 +49,6 @@ export default function CenterCard({
     return `${minutes.toString().padStart(2, '0')}:${seconds
       .toString()
       .padStart(2, '0')}`;
-  };
-
-  const handleReset = () => {
-    onReset();
   };
 
   const handleStart = (id: string) => {
@@ -74,8 +72,8 @@ export default function CenterCard({
     onResume(id);
   };
 
-  const handleCancel = () => {
-    onCancel();
+  const handleCancel = (id: string) => {
+    onCancel(id);
   };
 
   const getActionButton = ({
@@ -105,7 +103,11 @@ export default function CenterCard({
         );
       default:
         return (
-          <Button onClick={() => handleStart(id)} className='action-btn'>
+          <Button
+            onClick={() => handleStart(id)}
+            className='action-btn'
+            disabled={id === undefined}
+          >
             <Play className='mr-2 h-4 w-4' />
             开始
           </Button>
@@ -122,7 +124,10 @@ export default function CenterCard({
       </CardHeader>
       <CardContent className='flex flex-col items-center space-y-6'>
         <p className='text-base text-zinc-700 dark:text-zinc-300'>
-          当前任务：<span className='font-semibold'>{task.taskName}</span>
+          当前任务：
+          <span className='font-semibold'>
+            {JSON.stringify(task) === '{}' ? '无' : task.taskName}
+          </span>
         </p>
         <div className='flex gap-4'>
           {getActionButton({
@@ -132,9 +137,11 @@ export default function CenterCard({
           <Button
             variant='outline'
             className='action-btn'
-            onClick={handleCancel}
+            onClick={() => handleCancel(task.id)}
             disabled={
-              task.status === 'completed' || task.status === 'cancelled'
+              task.status === 'completed' ||
+              task.status === 'cancelled' ||
+              JSON.stringify(task) === '{}'
             }
           >
             <X className='mr-2 h-4 w-4' />
