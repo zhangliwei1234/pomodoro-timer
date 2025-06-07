@@ -1,6 +1,7 @@
 {
   "name": "pomodorotimer",
   "private": true,
+  "homepage": "./",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -10,6 +11,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^7.3.0",
+    "@capacitor/cli": "^7.3.0",
+    "@capacitor/core": "^7.3.0",
     "@iconify/react": "^6.0.0",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-slot": "^1.2.3",

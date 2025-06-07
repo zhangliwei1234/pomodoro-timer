@@ -1,54 +1,100 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+# Pomodoro Timer 开源项目文档
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🧠 项目简介
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Pomodoro Timer 是一个开源的番茄钟任务管理工具，旨在帮助用户更高效地规划时间、提升专注力。它结合了现代前端技术与本地数据库持久化能力，提供简洁直观的界面和实用的功能。
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+该项目基于以下核心技术构建：
+
+- **React** + **TypeScript**：实现类型安全的组件化开发
+- **Dexie.js**：轻量级 IndexedDB 封装，支持数据本地存储
+- **React Hooks**：统一状态管理和生命周期控制
+- **Lucide Icons**：图标资源丰富且可定制
+
+---
+
+## 📦 核心功能
+
+- ✅ 添加新任务并设置所需番茄钟数量
+- ✅ 开始/暂停计时器，实时更新剩余时间
+- ✅ 删除不再需要的任务
+- ✅ 显示当前运行或暂停的任务倒计时
+- ✅ 统计累计专注时间（小时）
+- ✅ 展示已完成任务总数
+
+---
+
+## 📁 项目结构概览
+
+本项目采用清晰的模块化结构，便于维护与扩展：
+
+```
+src/
+├── components/     # 各类 UI 组件
+├── db/             # 数据库相关逻辑
+├── hooks/          # 自定义 Hook
+├── pages/          # 页面路由组件
+├── types.ts        # 全局类型定义
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+## 🔧 技术亮点
+
+- **响应式数据绑定**：通过 `dexie-react-hooks` 实现数据库变更自动触发视图更新。
+- **自定义 Hook 管理倒计时**：封装通用倒计时逻辑，提高组件复用性。
+- **良好的 TypeScript 类型设计**：确保各模块间的数据传递安全可靠。
+- **组件化架构**：UI 组件独立拆分，便于测试和复用。
+
+---
+
+## 🚀 快速启动
+
+### 安装依赖
+
+```bash
+npm install
 ```
+
+
+### 启动开发服务器
+
+```bash
+npm run dev
+```
+
+
+访问本地地址即可使用应用。
+
+---
+
+## 🤝 如何贡献
+
+欢迎所有开发者参与本项目的建设与完善！
+
+1. Fork 仓库
+2. 创建新分支进行功能开发或问题修复
+3. 提交清晰的 commit 描述
+4. 发起 PR 并说明修改内容
+5. 参与讨论，持续改进
+
+我们鼓励任何形式的贡献：提交 Issue、优化代码、编写文档、提出建议等。
+
+---
+
+## 📜 许可证
+
+本项目遵循 MIT License 协议，您可以自由使用、复制、修改和发布本软件。
+
+
+---
+
+**文档更新日期**: 2025年6月8日
+
+---
