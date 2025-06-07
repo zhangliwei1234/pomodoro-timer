@@ -51,7 +51,7 @@ const Home = () => {
       taskName: task.taskName,
       totalPomodoros: task.pomodoroCount,
       completedPomodoros: 0,
-      remainingTime: 25,
+      remainingTime: 0.1,
       status: 'planned',
       id: nanoid(),
     });
@@ -97,7 +97,7 @@ const Home = () => {
       await PomodoroDB.tasks.update(id, {
         status: 'planned',
         completedPomodoros: tasksData[firstPendingIndex].completedPomodoros + 1,
-        remainingTime: 25,
+        remainingTime: 0.1,
       });
     }
   };
