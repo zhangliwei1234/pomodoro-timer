@@ -73,7 +73,11 @@ export default function CenterCard({
   };
 
   const handleCancel = (id: string) => {
-    onCancel(id);
+    if (task.status === 'active') {
+      alert('任务执行中不能取消');
+    } else {
+      onCancel(id);
+    }
   };
 
   const getActionButton = ({
